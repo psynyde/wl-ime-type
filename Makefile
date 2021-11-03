@@ -9,7 +9,7 @@ protocol_files = input-method-unstable-v2-protocol.h input-method-unstable-v2-pr
 all: wl-ime-type
 
 wl-ime-type: main.c $(protocol_files)
-	$(CC) $(CFLAGS) $(depflags) -o $@ $^
+	$(CC) $(CFLAGS) -o $@ $^ $(depflags)
 
 input-method-unstable-v2-protocol.h: protocol/input-method-unstable-v2.xml
 	$(WAYLAND_SCANNER) client-header $< $@
