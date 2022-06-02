@@ -18,6 +18,9 @@ protocol extension.
 *-h*
 	Show help message.
 
+*-s* <seat>
+	Select a seat by name.
+
 # AUTHORS
 
 Maintained by Simon Ser <contact@emersion.fr>, who is assisted by other

@@ -5,6 +5,8 @@
 #include <wayland-client.h>
 #include "input-method-unstable-v2-protocol.h"
 
+static const char *seat_name = NULL;
+
 static struct zwp_input_method_manager_v2 *ime_manager = NULL;
 static struct wl_seat *seat = NULL;
 
@@ -44,12 +46,31 @@ static const struct zwp_input_method_v2_listener ime_listener = {
 	.unavailable = ime_handle_unavailable,
 };
 
+static void seat_handle_name(void *data, struct wl_seat *s, const char *name)
+{
+	if (strcmp(name, seat_name) == 0) {
+		seat = s;
+	} else {
+		wl_seat_destroy(s);
+	}
+}
+
+static const struct wl_seat_listener seat_listener = {
+	.capabilities = noop,
+	.name = seat_handle_name,
+};
+
 static void registry_handle_global(void *data, struct wl_registry *registry, uint32_t name, const char *iface, uint32_t version)
 {
 	if (strcmp(iface, zwp_input_method_manager_v2_interface.name) == 0) {
 		ime_manager = wl_registry_bind(registry, name, &zwp_input_method_manager_v2_interface, 1);
 	} else if (seat == NULL && strcmp(iface, wl_seat_interface.name) == 0) {
-		seat = wl_registry_bind(registry, name, &wl_seat_interface, 1);
+		struct wl_seat *s = wl_registry_bind(registry, name, &wl_seat_interface, 2);
+		if (seat_name == NULL) {
+			seat = s;
+		} else {
+			wl_seat_add_listener(s, &seat_listener, NULL);
+		}
 	}
 }
 
@@ -63,8 +84,11 @@ static const char usage[] = "usage: wl-ime-type [options...] <text>\n";
 int main(int argc, char *argv[])
 {
 	int opt;
-	while ((opt = getopt(argc, argv, "h")) != -1) {
+	while ((opt = getopt(argc, argv, "hs:")) != -1) {
 		switch (opt) {
+		case 's':
+			seat_name = optarg;
+			break;
 		default:
 			fprintf(stderr, "%s", usage);
 			return opt == 'h' ? 0 : 1;
@@ -89,8 +113,17 @@ int main(int argc, char *argv[])
 	wl_display_roundtrip(display);
 	wl_registry_destroy(registry);
 
+	if (seat_name != NULL) {
+		// Second roundtrip to fetch seat names
+		wl_display_roundtrip(display);
+	}
+
 	if (seat == NULL) {
-		fprintf(stderr, "Compositor has no seat\n");
+		if (seat_name == NULL) {
+			fprintf(stderr, "No seat found\n");
+		} else {
+			fprintf(stderr, "No seat found with the name '%s'\n", seat_name);
+		}
 		return 1;
 	}
 	if (ime_manager == NULL) {
