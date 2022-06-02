@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 #include <wayland-client.h>
 #include "input-method-unstable-v2-protocol.h"
 
@@ -57,14 +58,25 @@ static const struct wl_registry_listener registry_listener = {
 	.global_remove = noop,
 };
 
+static const char usage[] = "usage: wl-ime-type [options...] <text>\n";
+
 int main(int argc, char *argv[])
 {
-	if (argc != 2) {
-		fprintf(stderr, "usage: wl-ime-type <text>\n");
+	int opt;
+	while ((opt = getopt(argc, argv, "h")) != -1) {
+		switch (opt) {
+		default:
+			fprintf(stderr, "%s", usage);
+			return opt == 'h' ? 0 : 1;
+		}
+	}
+
+	if (optind != argc - 1) {
+		fprintf(stderr, "%s", usage);
 		return 1;
 	}
 
-	const char *text = argv[1];
+	const char *text = argv[optind];
 
 	struct wl_display *display = wl_display_connect(NULL);
 	if (display == NULL) {
