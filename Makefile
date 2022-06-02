@@ -1,12 +1,13 @@
 CFLAGS = -g -Wall -Wextra -Wno-unused-parameter
 WAYLAND_SCANNER = $(shell pkg-config --variable=wayland_scanner wayland-scanner)
+SCDOC = scdoc
 
 deps = wayland-client
 depflags = $(shell pkg-config $(deps) --cflags --libs)
 
 protocol_files = input-method-unstable-v2-protocol.h input-method-unstable-v2-protocol.c
 
-all: wl-ime-type
+all: wl-ime-type wl-ime-type.1
 
 wl-ime-type: main.c $(protocol_files)
 	$(CC) $(CFLAGS) -o $@ $^ $(depflags)
@@ -16,5 +17,8 @@ input-method-unstable-v2-protocol.h: protocol/input-method-unstable-v2.xml
 input-method-unstable-v2-protocol.c: protocol/input-method-unstable-v2.xml
 	$(WAYLAND_SCANNER) private-code $< $@
 
+wl-ime-type.1: wl-ime-type.1.scd
+	$(SCDOC) < $< > $@
+
 clean:
-	$(RM) wl-ime-type $(protocol_files)
+	$(RM) wl-ime-type wl-ime-type.1 $(protocol_files)
