@@ -110,7 +110,10 @@ int main(int argc, char *argv[])
 
 	struct wl_registry *registry = wl_display_get_registry(display);
 	wl_registry_add_listener(registry, &registry_listener, NULL);
-	wl_display_roundtrip(display);
+	if (wl_display_roundtrip(display) < 0) {
+		fprintf(stderr, "wl_display_roundtrip failed\n");
+		return 1;
+	}
 	wl_registry_destroy(registry);
 
 	if (seat_name != NULL) {
@@ -151,7 +154,10 @@ int main(int argc, char *argv[])
 
 	// We'll exit right afterwards, so ensure the compositor has received our
 	// queued requests
-	wl_display_roundtrip(display);
+	if (wl_display_roundtrip(display) < 0) {
+		fprintf(stderr, "wl_display_roundtrip failed\n");
+		return 1;
+	}
 
 	zwp_input_method_v2_destroy(ime);
 	zwp_input_method_manager_v2_destroy(ime_manager);
