@@ -26,7 +26,7 @@ wl-ime-type.1: wl-ime-type.1.scd
 .PHONY: install
 install:
 	install -Dm755 wl-ime-type -t $(DESTDIR)$(PREFIX)/$(BINDIR)/
-	install -Dm644 wl-ime-type -t $(DESTDIR)$(PREFIX)/$(MANDIR)/man1
+	install -Dm644 wl-ime-type.1 -t $(DESTDIR)$(PREFIX)/$(MANDIR)/man1
 
 clean:
 	$(RM) wl-ime-type wl-ime-type.1 $(protocol_files)
