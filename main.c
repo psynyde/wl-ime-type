@@ -14,7 +14,11 @@ static bool ime_active = false;
 static bool ime_unavailable = false;
 static uint32_t ime_serial = 0;
 
-static void noop() {}
+static void noop_ime_surrounding_text(void *data, struct zwp_input_method_v2 *ime, const char *text, uint32_t cursor, uint32_t anchor) {}
+static void noop_ime_text_change_cause(void *data, struct zwp_input_method_v2 *ime, uint32_t cause) {}
+static void noop_ime_content_type(void *data, struct zwp_input_method_v2 *ime, uint32_t hint, uint32_t purpose) {}
+static void noop_seat_capabilities(void *data, struct wl_seat *seat, uint32_t capabilities) {}
+static void noop_registry_global_remove(void *data, struct wl_registry *registry, uint32_t name) {}
 
 static void ime_handle_activate(void *data, struct zwp_input_method_v2 *ime)
 {
@@ -39,9 +43,9 @@ static void ime_handle_unavailable(void *data, struct zwp_input_method_v2 *ime)
 static const struct zwp_input_method_v2_listener ime_listener = {
 	.activate = ime_handle_activate,
 	.deactivate = ime_handle_deactivate,
-	.surrounding_text = noop,
-	.text_change_cause = noop,
-	.content_type = noop,
+	.surrounding_text = noop_ime_surrounding_text,
+	.text_change_cause = noop_ime_text_change_cause,
+	.content_type = noop_ime_content_type,
 	.done = ime_handle_done,
 	.unavailable = ime_handle_unavailable,
 };
@@ -56,7 +60,7 @@ static void seat_handle_name(void *data, struct wl_seat *s, const char *name)
 }
 
 static const struct wl_seat_listener seat_listener = {
-	.capabilities = noop,
+	.capabilities = noop_seat_capabilities,
 	.name = seat_handle_name,
 };
 
@@ -76,7 +80,7 @@ static void registry_handle_global(void *data, struct wl_registry *registry, uin
 
 static const struct wl_registry_listener registry_listener = {
 	.global = registry_handle_global,
-	.global_remove = noop,
+	.global_remove = noop_registry_global_remove,
 };
 
 static const char usage[] = "usage: wl-ime-type [options...] <text>\n";
