@@ -6,7 +6,7 @@ BINDIR ?= bin
 MANDIR ?= share/man
 
 deps = wayland-client
-depflags = $(shell pkg-config $(deps) --cflags --libs)
+depflags = $(shell pkg-config --cflags --libs $(deps))
 
 protocol_files = input-method-unstable-v2-protocol.h input-method-unstable-v2-protocol.c
 
