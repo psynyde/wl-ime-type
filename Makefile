@@ -23,7 +23,8 @@ input-method-unstable-v2-protocol.c: protocol/input-method-unstable-v2.xml
 wl-ime-type.1: wl-ime-type.1.scd
 	$(SCDOC) < $< > $@
 
-.PHONY: install
+.PHONY: install clean
+
 install:
 	install -Dm755 wl-ime-type -t $(DESTDIR)$(PREFIX)/$(BINDIR)/
 	install -Dm644 wl-ime-type.1 -t $(DESTDIR)$(PREFIX)/$(MANDIR)/man1
