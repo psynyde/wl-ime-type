@@ -25,4 +25,4 @@ protocol extension.
 
 Maintained by Simon Ser <contact@emersion.fr>, who is assisted by other
 open-source contributors. For more information about wl-ime-type development,
-see <https://git.sr.ht/~emersion/wl-ime-type>.
+see <https://gitlab.freedesktop.org/emersion/wl-ime-type>.
