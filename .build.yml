@@ -1,0 +1,10 @@
+image: archlinux
+packages:
+  - wayland
+  - scdoc
+sources:
+  - https://gitlab.freedesktop.org/emersion/wl-ime-type.git
+tasks:
+  - build: |
+      cd wl-ime-type
+      make
