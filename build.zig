@@ -11,12 +11,12 @@ pub fn build(b: *std.Build) void {
     scanner.addCustomProtocol(b.path("./protocols/input-method-unstable-v2.xml"));
     scanner.addCustomProtocol(b.path("./protocols/text-input-unstable-v3.xml"));
 
-    scanner.generate("wl_seat", 1);
+    scanner.generate("wl_seat", 2);
     scanner.generate("zwp_input_method_manager_v2", 1);
     scanner.generate("zwp_text_input_manager_v3", 1);
 
     const exe = b.addExecutable(.{
-        .name = "zig_wayland_testbed",
+        .name = "wl-ime-type",
         .root_module = b.createModule(.{
             .root_source_file = b.path("src/main.zig"),
             .target = target,
