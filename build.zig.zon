@@ -1,13 +1,13 @@
 .{
-    .name = .zig_wayland_testbed,
-    .version = "0.0.1",
+    .name = .wl_ime_type,
+    .version = "0.1.0",
+    .minimum_zig_version = "0.15.2",
     .dependencies = .{
         .wayland = .{
             .url = "git+https://codeberg.org/ifreund/zig-wayland.git#52b54b71f1665b1b7ba61bf71a9319726e618fb6",
             .hash = "wayland-0.5.0-dev-lQa1ki3YAQCEdP63PCLFnVQzfXAixkrXsPavlEl8UkPe",
         },
     },
-    .minimum_zig_version = "0.15.2",
     .paths = .{""},
-    .fingerprint = 0x99a36596cb0317e2,
+    .fingerprint = 0xb08b44b61fbb3e8d,
 }
