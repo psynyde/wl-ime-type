@@ -1,80 +1,74 @@
 {
   description = "wl-ime-type";
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    zig2nix.url = "github:Cloudef/zig2nix";
     treefmt-nix.url = "github:numtide/treefmt-nix";
-    flake-utils.url = "github:numtide/flake-utils";
   };
+
   outputs =
-    {
-      self,
-      nixpkgs,
-      flake-utils,
-      treefmt-nix,
-    }:
-    flake-utils.lib.eachDefaultSystem (
+    { zig2nix, treefmt-nix, ... }:
+    let
+      flake-utils = zig2nix.inputs.flake-utils;
+    in
+    (flake-utils.lib.eachDefaultSystem (
       system:
       let
-        pkgs = import nixpkgs { inherit system; };
+        env = zig2nix.outputs.zig-env.${system} { zig = zig2nix.outputs.packages.${system}.zig-latest; };
+        pkgs = env.pkgs;
         project = "wl-ime-type";
-        zigDeps = pkgs.callPackage ./zig-deps.nix { };
       in
       {
-        packages = {
-          default = pkgs.stdenv.mkDerivation {
-            pname = project;
-            version = "0.1.0";
-            src = ./.;
+        packages.default = env.package rec {
+          pname = project;
+          src = ./.;
 
-            nativeBuildInputs = with pkgs; [
-              zig
-              scdoc
-              pkg-config
-              wayland-scanner
-            ];
+          nativeBuildInputs = with pkgs; [
+            scdoc
+            pkg-config
+            wayland-scanner
+          ];
 
-            buildInputs = with pkgs; [
-              wayland
-              wayland-protocols
-            ];
+          buildInputs = with pkgs; [
+            wayland
+            wayland-protocols
+          ];
 
-            postPatch = ''
-              ln -s ${zigDeps} $ZIG_GLOBAL_CACHE_DIR/p
-            '';
+          zigWrapperLibs = buildInputs;
 
-            zigBuildFlags = [ "-Doptimize=ReleaseFast" ];
+          zigBuildZonLock = ./build.zig.zon2json-lock;
 
-            postBuild = ''
-              scdoc < wl-ime-type.1.scd > wl-ime-type.1
-            '';
+          zigBuildFlags = [ "-Doptimize=ReleaseFast" ];
 
-            postInstall = ''
-              install -Dm644 wl-ime-type.1 -t $out/share/man/man1
-            '';
+          postBuild = ''
+            scdoc < wl-ime-type.1.scd > wl-ime-type.1
+          '';
 
-            meta = with pkgs.lib; {
-              description = "IME typing tool for Wayland in zig";
-              homepage = "https://github.com/psynyde/${project}";
-              license = licenses.bsd2;
-              maintainers = with maintainers; [ psynyde ];
-              platforms = platforms.linux;
-            };
+          postInstall = ''
+            install -Dm644 wl-ime-type.1 -t $out/share/man/man1
+          '';
+
+          meta = with pkgs.lib; {
+            mainProgram = project;
+            description = "IME typing tool for Wayland in zig";
+            homepage = "https://github.com/psynyde/${project}";
+            license = licenses.bsd2;
+            maintainers = with maintainers; [ psynyde ];
+            platforms = platforms.linux;
           };
         };
 
-        devShells.default = pkgs.mkShell {
+        devShells.default = env.mkShell {
           name = project;
           LSP_SERVER = "zls";
           packages = with pkgs; [
-            zig
-            # zls # FIX: https://nixpkgs-tracker.ocfox.me/?pr=488420
-            scdoc
-            zon2nix
+            zls
 
+            scdoc
             pkg-config
+            wayland-scanner
+
             wayland
             wayland-protocols
-            wayland-scanner
           ];
           shellHook = ''
             echo -e '(¬_¬") Entered ${project} :D'
@@ -89,5 +83,5 @@
           };
         };
       }
-    );
+    ));
 }
