@@ -27,7 +27,7 @@
             src = ./.;
 
             nativeBuildInputs = with pkgs; [
-              zig.hook
+              zig
               scdoc
               pkg-config
               wayland-scanner
@@ -67,7 +67,7 @@
           LSP_SERVER = "zls";
           packages = with pkgs; [
             zig
-            zls
+            # zls # FIX: https://nixpkgs-tracker.ocfox.me/?pr=488420
             scdoc
             zon2nix
 
